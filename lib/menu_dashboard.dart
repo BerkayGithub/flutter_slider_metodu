@@ -10,18 +10,26 @@ class MenuDashboard extends StatefulWidget {
   State<MenuDashboard> createState() => _MenuDashboardState();
 }
 
-class _MenuDashboardState extends State<MenuDashboard> with SingleTickerProviderStateMixin{
+class _MenuDashboardState extends State<MenuDashboard>
+    with SingleTickerProviderStateMixin {
   late double ekranYuksekligi, ekranGenisligi;
   bool menuAcikMi = false;
   late AnimationController controller;
   late Animation<double> scaleAnimation;
-  final Duration duration = Duration(milliseconds: 500);
+  late Animation<double> scaleMenuAnimation;
+  late Animation<Offset> menuOffsetAnimation;
+  final Duration duration = Duration(milliseconds: 250);
 
   @override
   void initState() {
     super.initState();
     controller = AnimationController(vsync: this, duration: duration);
     scaleAnimation = Tween(begin: 1.0, end: 0.6).animate(controller);
+    scaleMenuAnimation = Tween(begin: 0.0, end: 1.0).animate(controller);
+    menuOffsetAnimation = Tween(
+      begin: Offset(-1, 0),
+      end: Offset(0, 0),
+    ).animate(CurvedAnimation(parent: controller, curve: Curves.easeIn));
   }
 
   @override
@@ -45,26 +53,32 @@ class _MenuDashboardState extends State<MenuDashboard> with SingleTickerProvider
   }
 
   menuOlustur(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(left: 18.0),
-      child: Align(
-        alignment: Alignment.centerLeft,
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: <Widget>[
-            Text("Dashboard", style: menuFontStyle),
-            SizedBox(height: 10),
-            Text("Mesajlar", style: menuFontStyle),
-            SizedBox(height: 10),
-            Text("Utility Bills", style: menuFontStyle),
-            SizedBox(height: 10),
-            Text("Fund Transfer", style: menuFontStyle),
-            SizedBox(height: 10),
-            Text("Branches", style: menuFontStyle),
-            SizedBox(height: 10),
-          ],
+    return SlideTransition(
+      position: menuOffsetAnimation,
+      child: ScaleTransition(
+        scale: scaleMenuAnimation,
+        child: Padding(
+          padding: const EdgeInsets.only(left: 18.0),
+          child: Align(
+            alignment: Alignment.centerLeft,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                Text("Dashboard", style: menuFontStyle),
+                SizedBox(height: 10),
+                Text("Mesajlar", style: menuFontStyle),
+                SizedBox(height: 10),
+                Text("Utility Bills", style: menuFontStyle),
+                SizedBox(height: 10),
+                Text("Fund Transfer", style: menuFontStyle),
+                SizedBox(height: 10),
+                Text("Branches", style: menuFontStyle),
+                SizedBox(height: 10),
+              ],
+            ),
+          ),
         ),
       ),
     );
@@ -83,63 +97,80 @@ class _MenuDashboardState extends State<MenuDashboard> with SingleTickerProvider
           borderRadius: menuAcikMi == true ? BorderRadius.circular(40) : null,
           elevation: menuAcikMi == true ? 8 : 0,
           color: backgroundColor,
-          child: Padding(
-            padding: EdgeInsets.only(left: 16, right: 16, top: 8),
-            child: Column(
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    InkWell(
-                      onTap: () {
-                        setState(() {
-                          if(menuAcikMi){
-                            controller.reverse();
-                          }else{
-                            controller.forward();
-                          }
-                          menuAcikMi = !menuAcikMi;
-                        });
-                      },
-                      child: Icon(Icons.menu, color: Colors.white),
-                    ),
-                    Text(
-                      "My Cards",
-                      style: TextStyle(color: Colors.white, fontSize: 24),
-                    ),
-                    Icon(Icons.add_circle_outline, color: Colors.white),
-                  ],
-                ),
-                Container(
-                  margin: EdgeInsets.only(top: 10),
-                  height: 700,
-                  child: PageView(
-                    scrollDirection: Axis.horizontal,
-                    children: <Widget>[
-                      Container(
-                        color: Colors.pink,
-                        width: 100,
-                        margin: EdgeInsets.symmetric(horizontal: 12),
+          child: SingleChildScrollView(
+            child: Padding(
+              padding: EdgeInsets.only(left: 16, right: 16, top: 8),
+              child: Column(
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      InkWell(
+                        onTap: () {
+                          setState(() {
+                            if (menuAcikMi) {
+                              controller.reverse();
+                            } else {
+                              controller.forward();
+                            }
+                            menuAcikMi = !menuAcikMi;
+                          });
+                        },
+                        child: Icon(Icons.menu, color: Colors.white),
                       ),
-                      Container(
-                        color: Colors.red,
-                        width: 100,
-                        margin: EdgeInsets.symmetric(horizontal: 12),
+                      Text(
+                        "My Cards",
+                        style: TextStyle(color: Colors.white, fontSize: 24),
                       ),
-                      Container(
-                        color: Colors.purple,
-                        width: 100,
-                        margin: EdgeInsets.symmetric(horizontal: 12),
-                      ),
-                      Container(
-                        color: Colors.blue,
-                        width: 100,
-                        margin: EdgeInsets.symmetric(horizontal: 12),
-                      ),
+                      Icon(Icons.add_circle_outline, color: Colors.white),
                     ],
                   ),
-                )
-              ],
+                  Container(
+                    margin: EdgeInsets.only(top: 10),
+                    height: 200,
+                    child: PageView(
+                      scrollDirection: Axis.horizontal,
+                      children: <Widget>[
+                        Container(
+                          color: Colors.pink,
+                          width: 100,
+                          margin: EdgeInsets.symmetric(horizontal: 12),
+                        ),
+                        Container(
+                          color: Colors.red,
+                          width: 100,
+                          margin: EdgeInsets.symmetric(horizontal: 12),
+                        ),
+                        Container(
+                          color: Colors.purple,
+                          width: 100,
+                          margin: EdgeInsets.symmetric(horizontal: 12),
+                        ),
+                        Container(
+                          color: Colors.blue,
+                          width: 100,
+                          margin: EdgeInsets.symmetric(horizontal: 12),
+                        ),
+                      ],
+                    ),
+                  ),
+                  ListView.separated(
+                    itemBuilder: (context, index) {
+                      return ListTile(
+                        leading: Icon(Icons.person),
+                        title: Text("Öğrenci $index"),
+                        trailing: Icon(Icons.add),
+                      );
+                    },
+                    itemCount: 50,
+                    shrinkWrap: true,
+                    separatorBuilder: (BuildContext context, int index) {
+                      return Divider();
+                    },
+                    physics: BouncingScrollPhysics(),
+                  ),
+                ],
+              ),
             ),
           ),
         ),
